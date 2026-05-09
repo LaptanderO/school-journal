@@ -1,0 +1,100 @@
+{
+  "title": "Школьный журнал - Метрики",
+  "tags": ["school", "sre"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP запросы в секунду",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "{{method}} {{route}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "title": "Время ответа (P95)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[1m]))",
+          "legendFormat": "{{method}} {{route}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "id": 3,
+      "title": "Создано учеников",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "school_students_created_total"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 8 }
+    },
+    {
+      "id": 4,
+      "title": "Создано учителей",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "school_teachers_created_total"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 8 }
+    },
+    {
+      "id": 5,
+      "title": "Выставлено оценок",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "school_grades_given_total"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 8 }
+    },
+    {
+      "id": 6,
+      "title": "Распределение оценок",
+      "type": "piechart",
+      "targets": [
+        {
+          "expr": "school_grades_given_total",
+          "legendFormat": "Оценка {{grade}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 12 }
+    },
+    {
+      "id": 7,
+      "title": "Использование памяти (MB)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "process_heap_bytes / 1024 / 1024",
+          "legendFormat": "Heap"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 12 }
+    },
+    {
+      "id": 8,
+      "title": "Соединения с БД",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "school_db_connections"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 12 }
+    }
+  ],
+  "refresh": "10s"
+}

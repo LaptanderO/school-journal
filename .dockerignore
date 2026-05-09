@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Dev files
+.git/
+.gitignore
+.env
+.env.*
+!.env.production
+
+# Docker
+docker-compose*.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Dev Container
+.devcontainer/
+
+# Test files
+*.test.js
+*.spec.js
+coverage/
+
+# Build outputs
+frontend/dist/
+
+# Temporary files
+*.tmp
+*.swp

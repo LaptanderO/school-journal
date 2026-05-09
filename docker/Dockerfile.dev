@@ -1,0 +1,29 @@
+FROM node:20-alpine
+
+# Установка дополнительных инструментов 
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash \
+    postgresql-client
+
+# Установка nodemon глобально
+RUN npm install -g nodemon
+
+WORKDIR /app
+
+# Копирование package.json
+COPY package*.json ./
+
+# Установка зависимостей
+RUN npm install && npm cache clean --force
+
+# Меняем владельца на существующего пользователя node
+RUN chown -R node:node /app
+
+# Переключаемся на пользователя node
+USER node
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
