@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-school_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-school_prod_pass_2024}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-school_pass}
       POSTGRES_DB: ${DB_NAME:-school_journal}
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -30,7 +30,7 @@ services:
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-school_journal}
       DB_USER: ${DB_USER:-school_user}
-      DB_PASSWORD: ${DB_PASSWORD:-school_prod_pass_2024}
+      DB_PASSWORD: ${DB_PASSWORD:-school_pass}
     depends_on:
       postgres:
         condition: service_healthy
@@ -97,3 +97,4 @@ volumes:
 networks:
   school-network:
     driver: bridge
+    name: school-journal_school-network
