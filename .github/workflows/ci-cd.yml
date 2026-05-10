@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
   IMAGE_BACKEND: school-journal-backend
   IMAGE_FRONTEND: school-journal-frontend
 
@@ -24,11 +23,7 @@ jobs:
           POSTGRES_DB: school_journal
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout code
@@ -42,27 +37,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Wait for PostgreSQL
-        run: until pg_isready -h localhost -p 5432 -U school_user; do sleep 1; done
-
-      - name: Run database migrations
+      - name: Run database sync
         env:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: school_journal
           DB_USER: school_user
           DB_PASSWORD: school_pass
-        run: node -e "
-          const { sequelize } = require('./src/config/database');
-          (async () => {
-            await sequelize.sync({ force: true });
-            console.log('Database synced');
-            process.exit(0);
-          })();
-        "
+        run: node -e "const { sequelize } = require('./src/config/database'); (async () => { await sequelize.sync({ force: true }); console.log('Database synced'); process.exit(0); })();"
 
-      - name: Run tests (если есть)
-        run: echo "No tests yet" || true
+      - name: Run tests
+        run: echo "No tests yet"
 
   build-and-push:
     needs: test-backend
@@ -80,32 +65,13 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build Backend Image
-        run: |
-          docker build \
-            -f docker/Dockerfile.backend \
-            -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:latest \
-            -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:${{ github.sha }} \
-            .
+        run: docker build -f docker/Dockerfile.backend -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:latest .
 
       - name: Build Frontend Image
-        run: |
-          docker build \
-            -f docker/Dockerfile.frontend \
-            -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:latest \
-            -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:${{ github.sha }} \
-            .
+        run: docker build -f docker/Dockerfile.frontend -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:latest .
 
       - name: Push Backend Image
-        run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:latest
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:${{ github.sha }}
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:latest
 
       - name: Push Frontend Image
-        run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:latest
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
-
-      - name: Summary
-        run: |
-          echo "✅ Backend: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_BACKEND }}:latest"
-          echo "✅ Frontend: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:latest"
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_FRONTEND }}:latest
