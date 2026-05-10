@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: school_user
+      POSTGRES_PASSWORD: school_pass
+      POSTGRES_DB: school_journal
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    image: laptandero/school-journal-backend:latest
+    environment:
+      DB_HOST: postgres
+      DB_USER: school_user
+      DB_PASSWORD: school_pass
+      DB_NAME: school_journal
+    depends_on:
+      - postgres
+
+  frontend:
+    image: laptandero/school-journal-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
