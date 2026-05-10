@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   IMAGE_BACKEND: school-journal-backend
@@ -13,7 +13,7 @@ env:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15-alpine
@@ -44,7 +44,7 @@ jobs:
           DB_NAME: school_journal
           DB_USER: school_user
           DB_PASSWORD: school_pass
-        run: node -e "const { sequelize } = require('./src/config/database'); (async () => { await sequelize.sync({ force: true }); console.log('Database synced'); process.exit(0); })();"
+        run: node scripts/sync-db.js
 
       - name: Run tests
         run: echo "No tests yet"
@@ -53,7 +53,7 @@ jobs:
     needs: test-backend
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
