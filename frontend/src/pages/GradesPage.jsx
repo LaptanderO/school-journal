@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../services/api'
 import GradeForm from '../components/GradeForm'
+import useAuth from '../hooks/useAuth'
 
 const GradesPage = () => {
   const [grades, setGrades] = useState([])
@@ -9,6 +10,8 @@ const GradesPage = () => {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [filters, setFilters] = useState({ student_id: '', subject_id: '' })
+
+  const { canEdit } = useAuth()
 
   const loadData = useCallback(async () => {
     try {
@@ -44,9 +47,11 @@ const GradesPage = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <h2>Журнал оценок</h2>
-        <button className="success" onClick={() => setShowForm(true)}>
-          ➕ Поставить оценку
-        </button>
+        {canEdit && (
+          <button className="success" onClick={() => setShowForm(true)}>
+            ➕ Поставить оценку
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>

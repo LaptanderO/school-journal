@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../services/api'
 import SubjectForm from '../components/SubjectForm'
+import useAuth from '../hooks/useAuth'
 
 const SubjectsPage = () => {
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingSubject, setEditingSubject] = useState(null)
+
+  const { canCreateSubject, canDelete, canEdit } = useAuth()
 
   const loadData = useCallback(async () => {
     try {
@@ -51,9 +54,11 @@ const SubjectsPage = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Предметы</h2>
-        <button className="success" onClick={handleAdd}>
-          ➕ Добавить предмет
-        </button>
+        {canCreateSubject && (
+          <button className="success" onClick={handleAdd}>
+            ➕ Добавить предмет
+          </button>
+        )}
       </div>
 
       <table>
@@ -74,10 +79,12 @@ const SubjectsPage = () => {
                 <td>{subject.id}</td>
                 <td>{subject.name}</td>
                 <td>{subject.description || '-'}</td>
-                <td>
-                  <button onClick={() => handleEdit(subject)}>✏️</button>
-                  <button className="danger" onClick={() => handleDelete(subject.id, subject.name)}>🗑️</button>
-                </td>
+                {canCreateSubject && (
+                  <td>
+                    {canEdit && <button onClick={() => handleEdit(subject)}>✏️</button>}
+                    {canDelete && <button className="danger" onClick={() => handleDelete(subject.id, subject.name)}>🗑️</button>}
+                  </td>
+                )}
               </tr>
             ))
           )}

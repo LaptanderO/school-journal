@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../services/api'
 import TeacherForm from '../components/TeacherForm'
+import useAuth from '../hooks/useAuth'
 
 const TeachersPage = () => {
   const [teachers, setTeachers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingTeacher, setEditingTeacher] = useState(null)
+
+  const { canCreateTeacher, canDelete, canEdit } = useAuth()
 
   const loadData = useCallback(async () => {
     try {
@@ -51,9 +54,11 @@ const TeachersPage = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Учителя</h2>
-        <button className="success" onClick={handleAdd}>
-          ➕ Добавить учителя
-        </button>
+        {canCreateTeacher && (
+          <button className="success" onClick={handleAdd}>
+           ➕ Добавить учителя
+          </button>
+        )}
       </div>
 
       <table>
@@ -78,10 +83,12 @@ const TeachersPage = () => {
                 <td>{teacher.phone || '-'}</td>
                 <td>{teacher.birth_date || '-'}</td>
                 <td>{teacher.hire_date || '-'}</td>
-                <td>
-                  <button onClick={() => handleEdit(teacher)}>✏️</button>
-                  <button className="danger" onClick={() => handleDelete(teacher.id, teacher.full_name)}>🗑️</button>
-                </td>
+                {canCreateTeacher && (
+                  <td>
+                    {canEdit && <button onClick={() => handleEdit(teacher)}>✏️</button>}
+                    {canDelete && <button className="danger" onClick={() => handleDelete(teacher.id, teacher.full_name)}>🗑️</button>}
+                  </td>
+                )}
               </tr>
             ))
           )}

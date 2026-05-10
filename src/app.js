@@ -13,6 +13,7 @@ const teacherRoutes = require('./routes/teachers');
 const subjectRoutes = require('./routes/subjects');
 const classRoutes = require('./routes/classes');
 const gradeRoutes = require('./routes/grades');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 app.use(metrics.metricsMiddleware);
+app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
 
 // Metrics endpoint для Prometheus
 app.get('/metrics', metrics.metricsEndpoint);

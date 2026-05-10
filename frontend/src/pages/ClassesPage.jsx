@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../services/api'
 import ClassForm from '../components/ClassForm'
+import useAuth from '../hooks/useAuth'
 
 const ClassesPage = () => {
   const [classes, setClasses] = useState([])
@@ -8,6 +9,8 @@ const ClassesPage = () => {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingClass, setEditingClass] = useState(null)
+
+  const { canCreateClass, canDelete, canEdit } = useAuth()
 
   const loadData = useCallback(async () => {
     try {
@@ -61,9 +64,11 @@ const ClassesPage = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Классы</h2>
-        <button className="success" onClick={handleAdd}>
-          ➕ Добавить класс
-        </button>
+        {canCreateClass && (
+          <button className="success" onClick={handleAdd}>
+            ➕ Добавить класс
+          </button>
+        )}
       </div>
 
       <table>
@@ -86,10 +91,12 @@ const ClassesPage = () => {
                 <td>{classObj.name}</td>
                 <td>{getTeacherName(classObj.class_teacher_id)}</td>
                 <td>{classObj.students?.length || 0}</td>
-                <td>
-                  <button onClick={() => handleEdit(classObj)}>✏️</button>
-                  <button className="danger" onClick={() => handleDelete(classObj.id, classObj.name)}>🗑️</button>
-                </td>
+                {canCreateClass && (
+                  <td>
+                    {canEdit && <button onClick={() => handleEdit(classObj)}>✏️</button>}
+                    {canDelete && <button className="danger" onClick={() => handleDelete(classObj.id, classObj.name)}>🗑️</button>}
+                  </td>
+                )}
               </tr>
             ))
           )}

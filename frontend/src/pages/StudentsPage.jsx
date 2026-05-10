@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../services/api'
 import StudentForm from '../components/StudentForm'
+import useAuth from '../hooks/useAuth'
 
 const StudentsPage = () => {
   const [students, setStudents] = useState([])
@@ -56,6 +57,8 @@ const StudentsPage = () => {
     loadData()
   }
 
+  const { canEdit, canDelete, isAuthenticated } = useAuth()
+
   const filteredStudents = filterClass
     ? students.filter(s => s.class_id === parseInt(filterClass))
     : students
@@ -66,9 +69,12 @@ const StudentsPage = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Список учеников</h2>
-        <button className="success" onClick={handleAdd}>
-          ➕ Добавить ученика
-        </button>
+          {isAuthenticated && (
+            <button className="success" onClick={handleAdd}>
+              ➕ Добавить ученика
+            </button>
+          )}
+
       </div>
 
       <div style={{ marginTop: '1rem' }}>
@@ -103,10 +109,12 @@ const StudentsPage = () => {
                 <td>{student.birth_date || '-'}</td>
                 <td>{student.address || '-'}</td>
                 <td>{student.class?.name || '-'}</td>
-                <td>
-                  <button onClick={() => handleEdit(student)}>✏️</button>
-                  <button className="danger" onClick={() => handleDelete(student.id, student.full_name)}>🗑️</button>
-                </td>
+                {isAuthenticated && (
+                  <td>
+                      {canEdit && <button onClick={() => handleEdit(student)}>✏️</button>}
+                      {canDelete && <button className="danger" onClick={() => handleDelete(student.id, student.full_name)}>🗑️</button>}
+                  </td>
+                )}
               </tr>
             ))
           )}
