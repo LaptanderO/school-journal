@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const models = require('./models'); 
 require('dotenv').config();
 
 const { testConnection, sequelize } = require('./config/database');
@@ -82,11 +83,11 @@ app.use((req, res) => {
 const startServer = async () => {
     await testConnection();
     
-    // Синхронизация моделей с БД
-    await sequelize.sync({ alter: true });
-    console.log('✅ Models synchronized with database');
+    if (process.env.NODE_ENV !== 'test') {
+        await sequelize.sync({ alter: true });
+        console.log('✅ Models synchronized with database');
+    }
     
-    // Обновляем метрику соединений с БД
     const pool = sequelize.connectionManager.pool;
     if (pool) {
         metrics.setDbConnections(pool.size);
@@ -99,6 +100,8 @@ const startServer = async () => {
     });
 };
 
-startServer();
+if (process.env.NODE_ENV !== 'test') {
+    startServer();
+}
 
 module.exports = app;

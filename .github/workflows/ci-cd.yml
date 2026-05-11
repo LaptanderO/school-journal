@@ -37,8 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run database sync
+      - name: Sync test database
         env:
+          NODE_ENV: test
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: school_journal
@@ -47,7 +48,14 @@ jobs:
         run: node scripts/sync-db.js
 
       - name: Run tests
-        run: echo "No tests yet"
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: school_journal
+          DB_USER: school_user
+          DB_PASSWORD: school_pass
+        run: npm test
 
   build-and-push:
     needs: test-backend
